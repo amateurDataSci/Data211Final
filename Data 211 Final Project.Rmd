@@ -1,0 +1,72 @@
+---
+title: "Data 211 Final Project"
+author: "Patrick Meade"
+date: "2025-11-16"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Libraries
+```{r}
+library(ggplot2)
+library(readxl)
+library(tidyverse)
+```
+
+#Load data into a new dataset
+```{r}
+Calories<-read_excel("C:/Users/Patrick/Desktop/Prog/R/Data 211 Final Project Data Collection .xlsx")
+```
+
+#Change format for graph and table
+```{r}
+NewCalories<-Calories%>%
+  rename(`My Average`=`Ultra-Processed`)%>%
+  mutate(`Day of Data`=c(1:14))
+```
+
+
+# Initial Statistical Summary
+```{r}
+summary(Calories)
+sd(Calories$`Percent of Ultra-Processed Calories`)
+range(Calories$`Percent of Ultra-Processed Calories`)
+```
+# Table
+```{r}
+PercentTable<-NewCalories%>%
+  select(`Day of Data`,`Percent of Ultra-Processed Calories`)
+print(PercentTable)
+```
+
+
+# Visualization
+```{r}
+ggplot(data=NewCalories,aes(x=`Day of Data`,y=`Percent of Ultra-Processed Calories`))+
+  geom_bar(stat="identity",fill="forestgreen")+
+  scale_x_continuous(breaks=c(1:14))+
+  scale_y_continuous(breaks=seq(0,60,by=5))+
+  labs(title="Ultra Processed Calories - Personal Average",
+       x="Day of Data",
+       y="Percentage of Ultra-Processed Calories")+
+  theme_minimal()
+```
+
+# Statistical Analysis
+
+$p_m:$percentage of my ultra-processed calories.
+
+$p_a:$percentage of American average ultra-processed calories.
+
+$H_0:p_m=p_a$ vs. $H_1:p_m<p_a$
+
+```{r}
+t_test_result<-t.test(NewCalories$`Percent of Ultra-Processed Calories`,mu=55,alternative="less")
+print(t_test_result)
+```
+$p-value\approx 0.0019<\alpha=0.05$. Reject $H_0$. So at $5\%$ significance level, we have enough evidence to conclude that the percentage of my ultra-processed calories is less than the American average of 55%. 
