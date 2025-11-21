@@ -26,7 +26,6 @@ Calories<-read_excel("C:/Users/Patrick/Desktop/Prog/R/Data 211 Final Project Dat
 #Change format for graph and table
 ```{r}
 NewCalories<-Calories%>%
-  rename(`My Average`=`Ultra-Processed`)%>%
   mutate(`Day of Data`=c(1:14))
 ```
 
@@ -41,11 +40,13 @@ range(Calories$`Percent of Ultra-Processed Calories`)
 ```{r}
 PercentTable<-NewCalories%>%
   select(`Day of Data`,`Percent of Ultra-Processed Calories`)
-print(PercentTable)
+
+PercentTable
+NewCalories
 ```
 
 
-# Visualization
+# Visualizations
 ```{r}
 ggplot(data=NewCalories,aes(x=`Day of Data`,y=`Percent of Ultra-Processed Calories`))+
   geom_bar(stat="identity",fill="forestgreen")+
@@ -57,13 +58,26 @@ ggplot(data=NewCalories,aes(x=`Day of Data`,y=`Percent of Ultra-Processed Calori
   theme_minimal()
 ```
 
+#Formatting to long data for caloric comparison.
+```{r}
+LongCalories<-pivot_longer(NewCalories,cols =c("Unprocessed","Ultra-Processed"),names_to = "Type",values_to = "Calories")
+```
+
+```{r}
+ggplot(data=LongCalories,aes(x=`Day of Data`,y=Calories,fill=Type))+
+  geom_bar(stat="identity",position="dodge")+
+  labs(title="Unprocessed vs. Ultra-Processed Caloric Intake over 14 days")+
+  scale_x_continuous(breaks=c(1:14))+
+  scale_y_continuous(breaks=seq(0,1700,by=100))+
+  theme_minimal()+
+  scale_fill_manual(values=c("forestgreen","darkolivegreen3"))
+```
+
 # Statistical Analysis
 
-$p_m:$percentage of my ultra-processed calories.
+$p_m:$mean percentage of my ultra-processed calories.
 
-$p_a:$percentage of American average ultra-processed calories.
-
-$H_0:p_m=p_a$ vs. $H_1:p_m<p_a$
+$H_0:p_m=55$ vs. $H_1:p_m<55$
 
 ```{r}
 t_test_result<-t.test(NewCalories$`Percent of Ultra-Processed Calories`,mu=55,alternative="less")
